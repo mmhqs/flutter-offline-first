@@ -58,7 +58,7 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dateFormat = DateFormat('dd/MM/yyyy HH:mm');
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       elevation: task.completed ? 1 : 3,
@@ -84,9 +84,9 @@ class TaskCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
-              
+
               const SizedBox(width: 12),
-              
+
               // Conteúdo Principal
               Expanded(
                 child: Column(
@@ -98,37 +98,54 @@ class TaskCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        decoration: task.completed 
-                            ? TextDecoration.lineThrough 
+                        decoration: task.completed
+                            ? TextDecoration.lineThrough
                             : null,
-                        color: task.completed 
-                            ? Colors.grey 
-                            : Colors.black,
+                        color: task.completed ? Colors.grey : Colors.black,
                       ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     if (task.description.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         task.description,
                         style: TextStyle(
                           fontSize: 14,
-                          color: task.completed 
-                              ? Colors.grey.shade400 
+                          color: task.completed
+                              ? Colors.grey.shade400
                               : Colors.grey.shade700,
-                          decoration: task.completed 
-                              ? TextDecoration.lineThrough 
+                          decoration: task.completed
+                              ? TextDecoration.lineThrough
                               : null,
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                    
+
+                    // Tasks salvas apenas localmente na sync_queue
+                    if (task.localOnly) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(Icons.cloud_off, size: 14, color: Colors.orange),
+                          const SizedBox(width: 4),
+                          Text(
+                            "Tarefa pendente (offline)",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.orange,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
                     const SizedBox(height: 8),
-                    
+
                     // Metadata Row
                     Row(
                       children: [
@@ -165,9 +182,9 @@ class TaskCard extends StatelessWidget {
                             ],
                           ),
                         ),
-                        
+
                         const SizedBox(width: 12),
-                        
+
                         // Data
                         Icon(
                           Icons.access_time,
@@ -187,9 +204,9 @@ class TaskCard extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(width: 8),
-              
+
               // Botão Deletar
               IconButton(
                 onPressed: onDelete,

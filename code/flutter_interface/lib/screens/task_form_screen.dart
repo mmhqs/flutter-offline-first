@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_interface/services/connectivity_service.dart';
 import '../models/task.dart';
 import '../services/database_service.dart';
 
@@ -49,12 +50,15 @@ class _TaskFormScreenState extends State<TaskFormScreen> {
 
     try {
       if (widget.task == null) {
+        final online = await ConnectivityService.instance.isOnline;
+        
         // Criar nova tarefa
         final newTask = Task(
           title: _titleController.text.trim(),
           description: _descriptionController.text.trim(),
           priority: _priority,
           completed: _completed,
+          localOnly: !online, 
         );
         await DatabaseService.instance.create(newTask);
         

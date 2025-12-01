@@ -10,5 +10,8 @@ The goal is to build a simple to-do list app with a cool interface, screen navig
 * `/docs` - Contains the documentation used as a basis.
 * `/screenshots` - Contains screenshots and visual demonstrations of the project.
 
+## Run the project
+`cd code/flutter_interface` -> `flutter run`
+
 ## 🎥 App Demonstration
 Check out a [quick video](https://www.youtube.com/watch?v=PKATaZkUX8k) demonstration of the app's features and functionality on YouTube.

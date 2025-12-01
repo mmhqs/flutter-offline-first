@@ -7,6 +7,7 @@ class Task {
   final bool completed;
   final String priority;
   final DateTime createdAt;
+  final bool localOnly;
 
   Task({
     String? id,
@@ -14,6 +15,7 @@ class Task {
     this.description = '',
     this.completed = false,
     this.priority = 'medium',
+    this.localOnly = false,
     DateTime? createdAt,
   })  : id = id ?? const Uuid().v4(),
         createdAt = createdAt ?? DateTime.now();
@@ -26,6 +28,7 @@ class Task {
       'completed': completed ? 1 : 0,
       'priority': priority,
       'createdAt': createdAt.toIso8601String(),
+      'localOnly': localOnly ? 1 : 0,
     };
   }
 
@@ -37,6 +40,7 @@ class Task {
       completed: map['completed'] == 1,
       priority: map['priority'] ?? 'medium',
       createdAt: DateTime.parse(map['createdAt']),
+      localOnly: (map['localOnly'] ?? 0) == 1
     );
   }
 
@@ -45,6 +49,7 @@ class Task {
     String? description,
     bool? completed,
     String? priority,
+    bool? localOnly,
   }) {
     return Task(
       id: id,
@@ -53,6 +58,7 @@ class Task {
       completed: completed ?? this.completed,
       priority: priority ?? this.priority,
       createdAt: createdAt,
+      localOnly: localOnly ?? this.localOnly,
     );
   }
 }
