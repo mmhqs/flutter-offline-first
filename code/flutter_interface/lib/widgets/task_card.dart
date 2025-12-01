@@ -144,6 +144,24 @@ class TaskCard extends StatelessWidget {
                       ),
                     ],
 
+                    if (!task.localOnly) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Icon(Icons.check_circle, size: 14, color: Colors.green),
+                          const SizedBox(width: 4),
+                          Text(
+                            "Sincronizado",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.green, // Cor verde para indicar sucesso
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
                     const SizedBox(height: 8),
 
                     // Metadata Row
