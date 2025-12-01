@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/task.dart';
@@ -17,8 +19,6 @@ class DatabaseService {
   Future<Database> _initDB(String filePath) async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, filePath);
-    print('📌 Caminho real do banco: $path');
-
     return await openDatabase(path, version: 1, onCreate: _createDB);
   }
 
@@ -32,6 +32,7 @@ class DatabaseService {
         completed INTEGER NOT NULL,
         priority TEXT NOT NULL,
         createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL,
         localOnly INTEGER NOT NULL
       )
     ''');
@@ -123,8 +124,75 @@ class DatabaseService {
     await db.insert('sync_queue', {
       'taskId': taskId,
       'action': action,
-      'data': data != null ? data.toString() : null,
+      'data': data != null ? jsonEncode(data) : null,
       'timestamp': DateTime.now().toIso8601String(),
+    });
+  }
+
+  Future<void> syncChanges() async {
+    final db = await database;
+
+    await db.transaction((txn) async {
+      final queue = await txn.query('sync_queue', orderBy: 'timestamp ASC');
+
+      for (var item in queue) {
+        final taskId = item['taskId'] as String;
+        final action = item['action'] as String;
+        final dataString = item['data'] as String?;
+
+        Map<String, dynamic>? localData = dataString != null
+            ? jsonDecode(dataString) as Map<String, dynamic>
+            : null;
+
+        final serverRows = await txn.query(
+          'tasks',
+          where: 'id = ?',
+          whereArgs: [taskId],
+        );
+
+        Task? serverTask = serverRows.isNotEmpty
+            ? Task.fromMap(serverRows.first)
+            : null;
+
+        if (action == 'delete') {
+          if (serverTask != null) {
+            await txn.delete('tasks', where: 'id = ?', whereArgs: [taskId]);
+          }
+          continue;
+        }
+
+        if (localData == null) continue;
+        final localTask = Task.fromMap(localData);
+
+        bool shouldUpdate =
+            serverTask == null ||
+            serverTask.localOnly ||
+            localTask.updatedAt.isAfter(serverTask.updatedAt);
+
+        if (shouldUpdate) {
+          final Task syncedTask = localTask.copyWith(localOnly: false);
+
+          if (serverTask == null) {
+            print('SYNC: Criando nova tarefa online: ${syncedTask.title}');
+            await txn.insert('tasks', syncedTask.toMap());
+          } else {
+            print(
+              'SYNC: Atualizando tarefa (removendo flag offline): ${syncedTask.title}',
+            );
+            await txn.update(
+              'tasks',
+              syncedTask.toMap(),
+              where: 'id = ?',
+              whereArgs: [taskId],
+            );
+          }
+        } else {
+          print(
+            'SYNC: Ignorando update local (Servidor venceu ou dados iguais).',
+          );
+        }
+      }
+      await txn.delete('sync_queue');
     });
   }
 }

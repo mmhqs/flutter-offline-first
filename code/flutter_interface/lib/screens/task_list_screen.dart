@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_interface/services/connectivity_service.dart';
 import 'package:flutter_interface/widgets/online_status_banner.dart';
 import '../models/task.dart';
 import '../services/database_service.dart';
@@ -25,6 +26,21 @@ class _TaskListScreenState extends State<TaskListScreen> {
 
   Future<void> _loadTasks() async {
     setState(() => _isLoading = true);
+
+    final bool isOnline = await ConnectivityService.instance.isOnline;
+    if (isOnline) {
+      print('🔄 Dispositivo online. Tentando sincronizar alterações...');
+      try {
+        await DatabaseService.instance.syncChanges(); 
+        print('✅ Sincronização concluída com sucesso.');
+      } catch (e) {
+        print('❌ Erro durante a sincronização: $e');
+      }
+    } else {
+      print('📴 Dispositivo offline. Carregando dados locais.');
+    }
+
+    
     final tasks = await DatabaseService.instance.readAll();
     setState(() {
       _tasks = tasks;

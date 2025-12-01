@@ -130,13 +130,13 @@ class TaskCard extends StatelessWidget {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          Icon(Icons.cloud_off, size: 14, color: Colors.orange),
+                          Icon(Icons.cloud_off, size: 14, color: Colors.black),
                           const SizedBox(width: 4),
                           Text(
                             "Tarefa pendente (offline)",
                             style: TextStyle(
                               fontSize: 12,
-                              color: Colors.orange,
+                              color: Colors.black,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
