@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_interface/widgets/online_status_banner.dart';
 import '../models/task.dart';
 import '../services/database_service.dart';
 import '../widgets/task_card.dart';
@@ -151,6 +152,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
       
       body: Column(
         children: [
+          const ConnectivityStatusWidget(), 
           // Card de Estatísticas
           if (_tasks.isNotEmpty)
             Container(
